@@ -1,0 +1,13 @@
+{
+	"name": "vite-plugin-dev-backend-intergration",
+	"version": "1.0.0",
+	"main": "index.js",
+	"repository": "git@github.com:Fi2zz/vite-plugin-dev-backend-intergration.git",
+	"author": "Fitzz <wenjingbiaoi@qq.com>",
+	"license": "MIT",
+	"dependencies": {
+		"@types/node": "^18.16.1",
+		"typescript": "^5.0.4",
+		"vite": "^4.3.3"
+	}
+}
