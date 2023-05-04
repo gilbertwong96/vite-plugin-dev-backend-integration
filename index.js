@@ -19,10 +19,6 @@ function template(entryPoint, root, server) {
 const client = document.createElement("script");
 client.src = "${server.origin}/@vite/client";
 client.type = "module";
-const main = document.createElement("script");
-main.src = "${server.origin}/${entryPoint}";
-main.type = "module";
-main.crossorigin="anonymous"
 document.body.appendChild(client);
 ${entries.join("\n")}
 `;
