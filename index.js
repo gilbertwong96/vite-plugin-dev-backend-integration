@@ -1,5 +1,5 @@
-import path from "node:path";
-import fs from "node:fs";
+const path = require("path");
+const fs = require("fs");
 function outputFile(file, data, option = "utf-8") {
 	let dir = path.dirname(file);
 	if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -57,5 +57,4 @@ function viteBackendIntegration(entryPoints = []) {
 		},
 	};
 }
-
-export default viteBackendIntegration;
+module.exports = viteBackendIntegration;
