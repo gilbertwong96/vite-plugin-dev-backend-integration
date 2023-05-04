@@ -6,12 +6,12 @@ function outputFile(file, data, option = "utf-8") {
 	fs.writeFileSync(file, data, option);
 }
 function template(entryPoint, root, server) {
-	let entries = entryPoint.map((entry) => {
-		return `const main = document.createElement("script");
-		main.src = "${server.origin}/${entry.replace(root, "")}";
-		main.type = "module";
-		main.crossorigin="anonymous";
-		document.body.appendChild(main);`.trim();
+	let entries = entryPoint.map((entry, index) => {
+		return `const entry_${index} = document.createElement("script");
+		entry_${index}.src = "${server.origin}/${entry.replace(root, "")}";
+		entry_${index}.type = "module";
+		entry_${index}.crossorigin="anonymous";
+		document.body.appendChild(entry_${index});`.trim();
 	});
 
 	return `
