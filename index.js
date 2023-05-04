@@ -5,7 +5,15 @@ function outputFile(file, data, option = "utf-8") {
 	if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 	fs.writeFileSync(file, data, option);
 }
-function template(entryPoint, server) {
+function template(entryPoint, root, server) {
+	let entries = entryPoint.map((entry) => {
+		return `const main = document.createElement("script");
+		main.src = "${server.origin}/${entry.replace(root, "")}";
+		main.type = "module";
+		main.crossorigin="anonymous";
+		document.body.appendChild(main);`.trim();
+	});
+
 	return `
 const client = document.createElement("script");
 client.src = "${server.origin}/@vite/client";
@@ -15,7 +23,7 @@ main.src = "${server.origin}/${entryPoint}";
 main.type = "module";
 main.crossorigin="anonymous"
 document.body.appendChild(client);
-document.body.appendChild(main);
+${entries.join("\n")}
 `;
 }
 function viteBackendIntegration(entryPoints = []) {
@@ -41,11 +49,9 @@ function viteBackendIntegration(entryPoints = []) {
 		},
 		buildStart: function () {
 			if (!entryPoints.length) return;
-			entryPoints.forEach(function (_a) {
-				var input = _a.input,
-					output = _a.output;
-				input = input.replace(config.root, "");
-				var data = template(input, config.server);
+			entryPoints.forEach(function ({ input, output }) {
+				if (!Array.isArray(input)) input = [input];
+				var data = template(input, config.root, config.server);
 				outputFile(output, data);
 			});
 		},
