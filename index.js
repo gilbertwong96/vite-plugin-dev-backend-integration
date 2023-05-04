@@ -7,8 +7,9 @@ function outputFile(file, data, option = "utf-8") {
 }
 function template(entryPoint, root, server) {
 	let entries = entryPoint.map((entry, index) => {
+		entry = entry.replace(root, "").replace(/^(\/)/, "");
 		return `const entry_${index} = document.createElement("script");
-		entry_${index}.src = "${server.origin}/${entry.replace(root, "")}";
+		entry_${index}.src = "${server.origin}/${entry}";
 		entry_${index}.type = "module";
 		entry_${index}.crossorigin="anonymous";
 		document.body.appendChild(entry_${index});`.trim();
