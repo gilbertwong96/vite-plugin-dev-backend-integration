@@ -31,7 +31,7 @@ class EntryPoint {
 		return { code: this.wrapper(code), dest: this.output };
 	}
 	wrapper = (codes) => {
-		if (!codes) return;
+		if (!codes) return "";
 		return `(async function (){${codes}})();`.replace(/\n/g, "").trim();
 	};
 }
