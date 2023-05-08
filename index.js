@@ -7,9 +7,9 @@ function outputFile({ dest, code }, option = "utf-8") {
 }
 class EntryPoint {
 	constructor({ input, root, output }) {
-		this.input = this.normalizeInput(input);
-		this.output = output;
 		this.root = root || process.cwd();
+		this.output = output;
+		this.input = this.normalizeInput(input);
 		this.deps = ["/@vite/client"];
 	}
 	normalizeInput = (input) => {
