@@ -10,7 +10,7 @@ class EntryPoint {
 		this.root = root || process.cwd();
 		this.output = output;
 		this.input = this.normalizeInput(input);
-		this.deps = ["/@vite/client"];
+		this.deps = this.input ? ["/@vite/client"] : [];
 	}
 	normalizeInput = (input) => {
 		if (!input) return null;
@@ -30,8 +30,10 @@ class EntryPoint {
 		const code = req.map((x) => `await import('${x}');`).join("\n");
 		return { code: this.wrapper(code), dest: this.output };
 	}
-	wrapper = (codes) =>
-		`(async function (){${codes}})();`.replace(/\n/g, "").trim();
+	wrapper = (codes) => {
+		if (!codes) return;
+		return `(async function (){${codes}})();`.replace(/\n/g, "").trim();
+	};
 }
 
 function viteBackendIntegration(entryPoints = []) {
