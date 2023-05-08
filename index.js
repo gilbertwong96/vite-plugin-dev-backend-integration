@@ -24,7 +24,9 @@ class EntryPoint {
 		this.deps.push(this.normalizeInput(input));
 	}
 	toImport(base) {
-		const req = [...this.deps, this.input].map((file) => base + file);
+		const req = [...this.deps, this.input]
+			.filter(Boolean)
+			.map((file) => base + file);
 		const code = req.map((x) => `await import('${x}');`).join("\n");
 		return { code: this.wrapper(code), dest: this.output };
 	}
