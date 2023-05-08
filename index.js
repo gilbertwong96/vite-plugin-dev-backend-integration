@@ -1,28 +1,37 @@
 const path = require("path");
 const fs = require("fs");
-function outputFile(file, data, option = "utf-8") {
-	let dir = path.dirname(file);
+function outputFile({ dest, code }, option = "utf-8") {
+	let dir = path.dirname(dest);
 	if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-	fs.writeFileSync(file, data, option);
+	fs.writeFileSync(dest, code, option);
 }
-function template(entryPoint, root, server) {
-	let entries = entryPoint.map((entry, index) => {
-		entry = entry.replace(root, "").replace(/^(\/)/, "");
-		return `const entry_${index} = document.createElement("script");
-		entry_${index}.src = "${server.origin}/${entry}";
-		entry_${index}.type = "module";
-		entry_${index}.crossorigin="anonymous";
-		document.body.appendChild(entry_${index});`.trim();
-	});
+class EntryPoint {
+	constructor({ input, root, output }) {
+		this.input = this.normalizeInput(input);
+		this.output = output;
+		this.root = root || process.cwd();
+		this.deps = ["/@vite/client"];
+	}
+	normalizeInput = (input) => {
+		if (!input) return null;
+		input = input
+			.replace(this.root, "")
+			.replace(/^(\/)(\/?)/, "")
+			.trim();
+		return `/${input}`;
+	};
+	add(input) {
+		this.deps.push(this.normalizeInput(input));
+	}
+	toImport(base) {
+		const req = [...this.deps, this.input].map((file) => base + file);
+		const code = req.map((x) => `await import('${x}');`).join("\n");
+		return { code: this.wrapper(code), dest: this.output };
+	}
+	wrapper = (codes) =>
+		`(async function (){${codes}})();`.replace(/\n/g, "").trim();
+}
 
-	return `
-const client = document.createElement("script");
-client.src = "${server.origin}/@vite/client";
-client.type = "module";
-document.body.appendChild(client);
-${entries.join("\n")}
-`;
-}
 function viteBackendIntegration(entryPoints = []) {
 	var config;
 	return {
@@ -46,12 +55,17 @@ function viteBackendIntegration(entryPoints = []) {
 		},
 		buildStart: function () {
 			if (!entryPoints.length) return;
-			entryPoints.forEach(function ({ input, output }) {
-				if (!Array.isArray(input)) input = [input];
-				var data = template(input, config.root, config.server);
-				outputFile(output, data);
+			const origin = config.server.origin;
+			entryPoints.forEach((entryPoint) => {
+				if (entryPoint instanceof EntryPoint) {
+					const { code, dest } = entryPoint.toImport(origin);
+					outputFile({ dest, code });
+				}
 			});
 		},
 	};
 }
+
 module.exports = viteBackendIntegration;
+module.exports.createEntryPoint = ({ input, output, root }) =>
+	new EntryPoint({ input, output, root });
