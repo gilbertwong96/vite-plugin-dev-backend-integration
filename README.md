@@ -1,15 +1,15 @@
-# vite-plugin-dev-backend-intergration
+# vite-plugin-dev-backend-integration
 
-> A plugin intergrate with backend served template of `vite HMR`
+> A plugin integrate with backend served template of `vite HMR`
 
 ## Install
 
 ```bash
 
-    yarn add vite-plugin-dev-backend-intergration
+    yarn add vite-plugin-dev-backend-integration
 
     //or
-    npm i vite-plugin-dev-backend-intergration
+    npm i vite-plugin-dev-backend-integration
 
 ```
 
@@ -20,7 +20,7 @@ import { defineConfig } from "vite";
 import path from "path";
 import viteBackendIntegration, {
 	createEntryPoint,
-} from "vite-plugin-dev-backend-intergration";
+} from "vite-plugin-dev-backend-integration";
 
 const entryPoint = createEntryPoint({
 	root: process.cwd(),

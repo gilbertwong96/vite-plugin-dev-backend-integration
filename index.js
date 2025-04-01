@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+
 function outputFile({ dest, code }, option = "utf-8") {
 	let dir = path.dirname(dest);
 	if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -16,7 +17,7 @@ class EntryPoint {
 		if (!input) return null;
 		input = input
 			.replace(this.root, "")
-			.replace(/^(\/)(\/?)/, "")
+            .replace(path.sep, "")
 			.trim();
 		return `/${input}`;
 	};
@@ -26,7 +27,7 @@ class EntryPoint {
 	toImport(base) {
 		const req = [...this.deps, this.input]
 			.filter(Boolean)
-			.map((file) => base + file);
+			.map((file) => base + file.split(path.sep).join(path.posix.sep));
 		const code = req.map((x) => `await import('${x}');`).join("\n");
 		return { code: this.wrapper(code), dest: this.output };
 	}
@@ -39,7 +40,7 @@ class EntryPoint {
 function viteBackendIntegration(entryPoints = []) {
 	var config;
 	return {
-		name: "vite-plugin-dev-backend-intergration",
+		name: "vite-plugin-dev-backend-integration",
 		apply: "serve",
 		enforce: "pre",
 		configResolved: function (c) {
